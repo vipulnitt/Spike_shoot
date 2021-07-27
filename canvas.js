@@ -7,6 +7,8 @@ var ammo = canvas.getContext("2d");
 var ship_img_src = document.getElementById("ship");
 var ship_img = canvas.getContext("2d");
 var shooter_img = document.getElementById("shooter");
+var ship_img1 = canvas.getContext("2d");
+var ship_img1_src = document.getElementById("ship1");
 var move_alien =10;
 var dir_checker =0,tc=0;
 var vertical=413,horizontal=546;
@@ -17,11 +19,13 @@ var x=0,z=[60,60],w=0,y=[0,0],d=[],a=[],v=0;
 var fire=0,start=[],ammomove=[],ammoposition=[],gameover=0;
 var Hscore =localStorage.getItem('HScore');
 var speed=3,game_end=0,tt=0;
+var shot_no=[],xx;
 if(Hscore==null)
 Hscore=0;
 for(var i=0;i<72;i++)
 {
     arr[i]=1;
+    shot_no[i]=1;
 }
 animate();
 function animate()
@@ -35,6 +39,14 @@ for(var i=1;i<19;i++)
     if(second==10)
     {
     level=2;
+    for(var i=0;i<72;i++)
+   {
+    if(arr[i]==0)
+    {
+        arr[i]=2;
+        shot_no[i]=2;
+    }
+       }
     }
     ship_img.clearRect(0,0,innerWidth,innerHeight);
     gameovermsg.fillStyle="Blue";
@@ -64,6 +76,9 @@ for(var i=1;i<19;i++)
     if(ammomove[k]<=(z[l]+60)&&((a[l]-10)<=ammoposition[k]&&(a[l]+60)>=ammoposition[k]))
     {
         w=0;
+        shot_no[k]--;
+        console.log(shot_no);
+        if(shot_no[k]==0)
         start[k]=0;
         if(level==1)
         score+=2;
@@ -75,28 +90,40 @@ for(var i=1;i<19;i++)
     { 
      if(ammoposition[k]+28>pos[i]&&ammoposition[k]+28<pos[i+1])
      {
-     /* if(arr[i+72]!=0&&ammomove<310){
-        arr[72+i]=0;
-        start=0;
-      }
-      else*/ if(arr[i+54]!=0&&ammomove[k]<250)
+      if(arr[i+54]!=0&&ammomove[k]<250)
       {
-      arr[i+54]=0;
+      shot_no[i+54]--;
+      if(shot_no[i+54]==0)
+      {
+        arr[i+54]=0;
+      }
       start[k]=0;
       score+=1;
       }
       else if(arr[i+36]!=0&&ammomove[k]<190){
+      shot_no[i+36]--;
+      if(shot_no[i+36]==0)
+      {
       arr[i+36]=0;
+      }
       start[k]=0;
       score+=1;
       }
       else if(arr[i+18]!=0&&ammomove[k]<=130){
+      shot_no[i+18]--;
+      if(shot_no[i+18]==0)
+      {
       arr[i+18]=0;
+      }
       start[k]=0;
       score+=1;
       }
       else if(arr[i]!=0&&ammomove[k]<=70){
-        arr[i]=0;
+          shot_no[i]--;
+          if(shot_no[i]==0)
+          {
+           arr[i]=0;
+          }
         start[k]=0;
         score+=1;
         }
@@ -140,7 +167,7 @@ for(var i=1;i<19;i++)
                 v++;
             do{
             d[l]=Math.floor(Math.random()*90);
-            }while(arr[d[l]]!=1)
+            }while(arr[d[l]]==0)
         
          w=1;
          y[l]=1;
@@ -153,11 +180,11 @@ for(var i=1;i<19;i++)
             z[l]=i;
             y[l]=0;
             a[l]=j;
+            arr[x]=0;
         }
-        if((w==1||v>0)&&x==d[l])
+        if(w==1&&v>0&&x==d[l])
         {
         z[l]+=speed;
-        arr[x]=0;
          ship_img.drawImage(ship_img_src,a[l],z[l],60,60);
          if((z[l]>=vertical&&z[l]<=vertical+2)&&((a[l]>horizontal&&a[l]<(horizontal+60))||((a[l]+60)<=(horizontal+60)&&(a[l]+60)>=horizontal)))
          {
@@ -165,7 +192,7 @@ for(var i=1;i<19;i++)
               gameover=1;
          }
         }
-        if(z[l]==492)
+        if(z[l]>492)
         {
             w=0;
             v--;
@@ -175,6 +202,11 @@ for(var i=1;i<19;i++)
     {
     ship_img.drawImage(ship_img_src,j,i,60,60);
     game_end++
+    }
+    if(arr[x]==2)
+    {
+        ship_img1.drawImage(ship_img1_src,j,i,60,60);
+        game_end++;
     }
     }
 }
