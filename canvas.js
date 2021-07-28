@@ -13,10 +13,10 @@ var vertical=413,horizontal=546;
 var arr=[],shot=0,pos=[];
 var score=0,level=1,second=0;
 var time= setInterval(function(){time; second++;},1000);
-var x=0,z=[60,60],w=0,y=[0,0],d=[],a=[],v=0;
+var x=0,z=[60,60],w=[0,0],y=[0,0],d=[],a=[],v=0;
 var fire=0,start=[],ammomove=[],ammoposition=[],gameover=0;
 var Hscore =localStorage.getItem('HScore');
-var speed=3,game_end=0,tt=0;
+var speed=3,game_end=0,tt=0,speedlevel=1,bonas_scr=0,bullet_speed=5,timeset=10;
 if(Hscore==null)
 Hscore=0;
 for(var i=0;i<72;i++)
@@ -32,14 +32,16 @@ for(var i=1;i<19;i++)
     pos[i]=pos[i-1]+60;
 }
     x=0;
-    if(second==10)
+    if(second==timeset&&bonas_scr==0)
     {
     level=2;
+    score+=5;
+    bonas_scr=1;
     }
     ship_img.clearRect(0,0,innerWidth,innerHeight);
     gameovermsg.fillStyle="Blue";
         gameovermsg.font="13px Arial";
-        gameovermsg.fillText("Ammo:"+(5-shot),1180,340);
+        gameovermsg.fillText("Ammo:"+(5-shot),1176,120);
     ammo.fillStyle="Black";
     ammo.fillRect(1170,0,5,550);
     gameovermsg.fillStyle="RED";
@@ -50,6 +52,7 @@ for(var i=1;i<19;i++)
      gameovermsg.fillText("Score:"+score,1176,40);
      gameovermsg.fillText("Timer:"+second,1176,60);
      gameovermsg.fillText("Level:"+level,1176,80);
+     gameovermsg.fillText("SLevel:"+speedlevel,1176,100);
     if(gameover==0&&tt==0)
     requestAnimationFrame(animate);
     shooter.drawImage(shooter_img,horizontal,vertical,60,60);
@@ -58,12 +61,12 @@ for(var i=1;i<19;i++)
     {
     if(start[k]==1)
     {
-    ammomove[k]-=3;
+    ammomove[k]-=bullet_speed;
     ammo.fillRect(ammoposition[k]+28,ammomove[k],4,10);
     for(var l=0;l<level;l++){
-    if(ammomove[k]<=(z[l]+60)&&((a[l]-10)<=ammoposition[k]&&(a[l]+60)>=ammoposition[k]))
+    if(ammomove[k]<=(z[l]+60)&&((a[l]-30)<=ammoposition[k]&&(a[l]+60)>=ammoposition[k]))
     {
-        w=0;
+        w[l]=0;
         start[k]=0;
         if(level==1)
         score+=2;
@@ -113,15 +116,15 @@ for(var i=1;i<19;i++)
     {
         gameovermsg.fillStyle="Blue";
         gameovermsg.font="25px Arial";
-        gameovermsg.fillText("R",1200,110);
-        gameovermsg.fillText("E",1200,135);
-        gameovermsg.fillText("L",1200,160);
-        gameovermsg.fillText("O",1200,185);
-        gameovermsg.fillText("A",1200,210);
-        gameovermsg.fillText("D",1200,235);
-        gameovermsg.fillText("I",1200,260);
-        gameovermsg.fillText("N",1200,285);
-        gameovermsg.fillText("G",1200,310);
+        gameovermsg.fillText("R",1200,150);
+        gameovermsg.fillText("E",1200,175);
+        gameovermsg.fillText("L",1200,200);
+        gameovermsg.fillText("O",1200,225);
+        gameovermsg.fillText("A",1200,250);
+        gameovermsg.fillText("D",1200,275);
+        gameovermsg.fillText("I",1200,300);
+        gameovermsg.fillText("N",1200,325);
+        gameovermsg.fillText("G",1200,350);
     }
   if(shot==5&&tc==0)
     {
@@ -132,42 +135,39 @@ for(var i=1;i<19;i++)
     for(var i=0,x=0;i<240;i+=60)
 { 
     for(var j=move_alien;j<1050+move_alien;j+=60,x++)
-    {
-        if(w==0)
+    {    for(var l=0;l<level;l++)
         {
-            for(var l=0;l<level;l++)
-            {
+        if(w[l]==0)
+        {
+            
                 v++;
             do{
             d[l]=Math.floor(Math.random()*90);
-            }while(arr[d[l]]!=1)
-        
-         w=1;
+            }while(arr[d[l]]!=1);
+         w[l]=1;
          y[l]=1;
         }
-        }
-        for(var l=0;l<level;l++)
-            {
+       
         if(y[l]==1&&x==d[l])
         {
             z[l]=i;
             y[l]=0;
             a[l]=j;
+            arr[x]=0;
         }
-        if((w==1||v>0)&&x==d[l])
+        if((w[l]==1||v>0)&&x==d[l])
         {
         z[l]+=speed;
-        arr[x]=0;
          ship_img.drawImage(ship_img_src,a[l],z[l],60,60);
-         if((z[l]>=vertical&&z[l]<=vertical+2)&&((a[l]>horizontal&&a[l]<(horizontal+60))||((a[l]+60)<=(horizontal+60)&&(a[l]+60)>=horizontal)))
+         if((z[l]>=vertical&&z[l]<=vertical+60)&&((a[l]>horizontal&&a[l]<(horizontal+60))||((a[l]+60)<=(horizontal+60)&&(a[l]+60)>=horizontal)))
          {
               z[l]=492;
               gameover=1;
          }
         }
-        if(z[l]==492)
+        if(z[l]>=492&&w[l]==1)
         {
-            w=0;
+            w[l]=0;
             v--;
         }
     }
@@ -180,15 +180,19 @@ for(var i=1;i<19;i++)
 }
 if(game_end==0)
 {
-    gameovermsg.fillStyle="GREEN";
-        gameovermsg.font="25px Arial";
-        gameovermsg.fillText("Game End!",500,350,200);
-        if(Hscore<=score)
-        {
-            gameovermsg.fillText("Congratulation! You have crossed Highest Score!",300,320);
-        localStorage.setItem("HScore",score);
-        }
-    tt=1;
+   speedlevel+=2;
+    tt=0;
+    speed+=3;
+    game_end=1;
+    for(var i=0;i<72;i++)
+{
+    arr[i]=1;
+} 
+w=[0,0];
+x=0;
+score+=5;
+bullet_speed++;
+timeset+=second;
 }
 if(gameover==1)
     {
@@ -223,19 +227,19 @@ dir_checker=0;
 document.body.onkeydown=  function(e){
     if(e.keyCode==37)//left
     {
-        if(horizontal>0)
+        if(horizontal>10)
         horizontal-=16;
         //console.log("left");
     }
     if(e.keyCode==38)//upper
     {
-        //console.log("upper");
+       if(vertical>270)
         vertical-=16;
     }
     if(e.keyCode==39)//right
     {
        // console.log("right");
-        if(horizontal<1140)
+        if(horizontal<1100)
         horizontal+=16;
     }
     if(e.keyCode==40) //down
